@@ -1,0 +1,61 @@
+- name: Setup Web Server
+  hosts: web_servers
+  become: yes
+  tasks:
+    - name: Install epel-release package
+      ansible.builtin.yum:
+        name: epel-release
+        state: present
+
+    - name: Install git, python-pip, and yum-utils
+      ansible.builtin.yum:
+        name:
+          - git
+          - python3-pip
+          - yum-utils
+        state: present
+
+    - name: Add Docker CE repository
+      ansible.builtin.shell: |
+        yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      args:
+        creates: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker CE, Docker CE CLI, containerd.io, and Docker Compose
+      ansible.builtin.yum:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose
+        state: present
+
+    - name: Start and enable Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Copy SSH key to server
+      ansible.builtin.copy:
+        src: /path/to/local/id_rsa.pub
+        dest: /root/.ssh/authorized_keys
+        mode: '0600'
+
+    - name: Clone application repository
+      ansible.builtin.git:
+        repo: 'https://github.com/your-repo/app.git'
+        dest: /opt/app
+        version: master
+
+    - name: Build Docker image
+      ansible.builtin.command:
+        cmd: docker build -t your-docker-image:latest /opt/app
+        chdir: /opt/app
+
+    - name: Log in to Docker Hub
+      ansible.builtin.shell: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+    - name: Push Docker image to Docker Hub
+      ansible.builtin.command:
+        cmd: docker push your-docker-image:latest
