@@ -1,61 +1,34 @@
-- name: Setup Web Server
-  hosts: web_servers
-  become: yes
-  tasks:
-    - name: Install epel-release package
-      ansible.builtin.yum:
-        name: epel-release
-        state: present
+---
 
-    - name: Install git, python-pip, and yum-utils
-      ansible.builtin.yum:
-        name:
-          - git
-          - python3-pip
-          - yum-utils
-        state: present
 
-    - name: Add Docker CE repository
-      ansible.builtin.shell: |
-        yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-      args:
-        creates: /etc/yum.repos.d/docker-ce.repo
+- name: start an Jenkins server
+  amazon.aws.ec2_instance:
+  aws_access_key: "{{ Asecret_keyZ }}"
+  aws_secret_key: "{{ secret_key}}"
+    name: "Oren-Jenkins-Server"
+    key_name: "oren-3"
+    vpc_subnet_id: subnet-0e2fc940e7df7c5fd
+    instance_type: t2.micro
+    security_group: default
+    region: us-east-1
+    network:
+      assign_public_ip: true
+    image_id: ami-0a0e5d9c7acc336f1
+    tags:
+      Environment: Jenkins-Server
 
-    - name: Install Docker CE, Docker CE CLI, containerd.io, and Docker Compose
-      ansible.builtin.yum:
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-compose
-        state: present
-
-    - name: Start and enable Docker service
-      ansible.builtin.service:
-        name: docker
-        state: started
-        enabled: yes
-
-    - name: Copy SSH key to server
-      ansible.builtin.copy:
-        src: /path/to/local/id_rsa.pub
-        dest: /root/.ssh/authorized_keys
-        mode: '0600'
-
-    - name: Clone application repository
-      ansible.builtin.git:
-        repo: 'https://github.com/your-repo/app.git'
-        dest: /opt/app
-        version: master
-
-    - name: Build Docker image
-      ansible.builtin.command:
-        cmd: docker build -t your-docker-image:latest /opt/app
-        chdir: /opt/app
-
-    - name: Log in to Docker Hub
-      ansible.builtin.shell: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-    - name: Push Docker image to Docker Hub
-      ansible.builtin.command:
-        cmd: docker push your-docker-image:latest
+- name: start an Deployment server
+  amazon.aws.ec2_instance:
+  aws_access_key: "{{ secret_key }}"
+  aws_secret_key: "{{ secret_key }}"
+    name: "Oren-Deployment-Server"
+    key_name: "oren-3"
+    vpc_subnet_id: subnet-0e2fc940e7df7c5fd
+    instance_type: t2.micro
+    security_group: default
+    region: us-east-1
+    network:
+      assign_public_ip: true
+    image_id: ami-0a0e5d9c7acc336f1
+    tags:
+      Environment: Deployment-Server
