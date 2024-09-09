@@ -1,38 +1,41 @@
 ---
 
+
 - name: Start EC2 Instances
   hosts: localhost
   gather_facts: no
+  vars_files: 
+    - vars.yaml
   tasks:
     - name: start an Jenkins server
       amazon.aws.ec2_instance:
-      aws_access_key: "{{ Asecret_keyZ }}"
-      aws_secret_key: "{{ secret_key}}"
-      name: "Oren-Jenkins-Server"
-      key_name: "oren-3"
-      vpc_subnet_id: subnet-0e2fc940e7df7c5fd
-      instance_type: t2.micro
-      security_group: default
-      region: us-east-1
-      network:
-        assign_public_ip: true
-      image_id: ami-0a0e5d9c7acc336f1
-      tags:
-        Environment: Jenkins-Server
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        name: "Oren-Jenkins-Server"
+        key_name: "oren-3"
+        vpc_subnet_id: subnet-0e2fc940e7df7c5fd
+        instance_type: t2.micro
+        security_group: default
+        region: us-east-1
+        network:
+          assign_public_ip: true
+        image_id: ami-0a0e5d9c7acc336f1
+        tags:
+          Environment: Jenkins-Server
 
     - name: start an Deployment server
       amazon.aws.ec2_instance:
-      aws_access_key: "{{ secret_key }}"
-      aws_secret_key: "{{ secret_key }}"
-      name: "Oren-Deployment-Server"
-      key_name: "oren-3"
-      vpc_subnet_id: subnet-0e2fc940e7df7c5fd
-      instance_type: t2.micro
-      security_group: default
-      region: us-east-1
-      network:
-        assign_public_ip: true
-      image_id: ami-0a0e5d9c7acc336f1
-      tags:
-        Environment: Deployment-Server
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        name: "Oren-Deployment-Server"
+        key_name: "oren-3"
+        vpc_subnet_id: subnet-0e2fc940e7df7c5fd
+        instance_type: t2.micro
+        security_group: default
+        region: us-east-1
+        network:
+          assign_public_ip: true
+        image_id: ami-0a0e5d9c7acc336f1
+        tags:
+          Environment: Deployment-Server
       

@@ -1,6 +1,6 @@
 ---
 - name: Setup Web Server
-  hosts: web_servers
+  hosts: localhost
   become: yes
   tasks:
     - name: Install epel-release package
